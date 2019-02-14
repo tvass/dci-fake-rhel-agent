@@ -1,1 +1,9 @@
----
+# Sample to show how to upload files to DCI control server
+- name: Upload files to DCI
+  dci_file:
+    path: '{{ item }}'
+    name: '{{ item }}'
+    job_id: '{{ hostvars.localhost.job_id }}'
+  with_items:
+    - /etc/passwd
+    - /etc/group
