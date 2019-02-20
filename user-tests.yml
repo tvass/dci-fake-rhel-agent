@@ -1,9 +1,44 @@
 # Sample to show how to upload files to DCI control server
+- name: Generate fake test result-1
+  copy:
+    dest: /tmp/result-1.xml
+    content: |
+      <testsuite tests="3">
+      <testcase classname="foo1" name="ASuccessfulTest"/>
+      <testcase classname="foo2" name="AnotherSuccessfulTest"/>
+      <testcase classname="foo3" name="AFailingTest">
+      <failure type="NotEnoughFoo"> details about failure </failure>
+      </testcase>
+      </testsuite>
+
+- name: Generate fake test result-2
+  copy:
+    dest: /tmp/result-2.xml
+    content: |
+      <testsuite tests="3">
+      <testcase classname="foo1" name="ASuccessfulTest"/>
+      <testcase classname="foo2" name="AnotherSuccessfulTest"/>
+      <testcase classname="foo3" name="AFailingTest">
+      <failure type="NotEnoughFoo"> details about failure </failure>
+      </testcase>
+      </testsuite>
+
+- name: Copy tests results from lab server to jumpbox it-self
+  fetch:
+    src: '{{ item }}'
+    dest: '{{ item }}'
+    flat: yes
+  with_items:
+    - /tmp/result-1.xml
+    - /tmp/result-2.xml
+
 - name: Upload files to DCI
   dci_file:
     path: '{{ item }}'
     name: '{{ item }}'
     job_id: '{{ hostvars.localhost.job_id }}'
+    mime: "application/junit"
+  delegate_to: localhost
   with_items:
-    - /etc/passwd
-    - /etc/group
+    - /tmp/result-1.xml
+    - /tmp/result-2.xml
